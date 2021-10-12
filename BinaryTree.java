@@ -1,8 +1,8 @@
 class Node{
-	String name;
+	int name;
 	Node left;
 	Node right;
-	public Node(String name) {
+	public Node(int name) {
 		this.name=name;
 		left=right=null;
 	}
@@ -11,7 +11,7 @@ public class BinaryTree{
 	//Root of the Binary Tree
     Node root;
  
-    Node findLCA(String n1, String n2)
+    Node findLCA(int n1, int n2)
     {
         return findLCA(root, n1, n2);
     }
@@ -19,7 +19,7 @@ public class BinaryTree{
     // This function returns pointer to LCA of two given
     // values n1 and n2. This function assumes that n1 and
     // n2 are present in Binary Tree
-    Node findLCA(Node node, String n1, String n2)
+    Node findLCA(Node node, int n1, int n2)
     {
         // Base case
         if (node == null)
@@ -45,18 +45,4 @@ public class BinaryTree{
         return (left_lca != null) ? left_lca : right_lca;
     }
  
-    /* Driver program to test above functions */
-    public static void main(String args[])
-    {
-        BinaryTree tree = new BinaryTree();
-        tree.root = new Node("Amber");
-        tree.root.left = new Node("Brad");
-        tree.root.right = new Node("Chad");
-        tree.root.left.left = new Node("Mike");
-        tree.root.left.right = new Node("James");
-        tree.root.right.left = new Node("Laura");
-        tree.root.right.right = new Node("Jack");
-        System.out.println("LCA(Mike,James) = " + tree.findLCA("Brad","Chad"));
-        
-    }
 }
