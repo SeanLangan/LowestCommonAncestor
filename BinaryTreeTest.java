@@ -5,22 +5,22 @@ import org.junit.Test;
 public class BinaryTreeTest {
 
 	@Test
-	public void testEmptyLcaTree() {
-		BinaryTree tree= new BinaryTree();
-		assertEquals("Test Lowest common ancestor of an empty tree",null,tree.findLCA(0,0));
+	public void testEmpty() {
+		BinaryTree tree = new BinaryTree();
+		assertEquals(-1,tree.LCA(0,0));
 	}
 	
 	@Test
-	public void testOneNodeLcaTree()
+	public void testSingle()
 	{
-		BinaryTree tree= new BinaryTree();
+		BinaryTree tree = new BinaryTree();
 		tree.root = new Node(1);
-		assertEquals("Test Lowest common ancestor of a one node tree",1,tree.findLCA(1,0).name);
+		assertEquals(-1,tree.LCA(1,0));
 	}
 	
 	@Test 
-	public void testMultiNodeTree() {
-		BinaryTree tree= new BinaryTree();
+	public void testNormalCase() {
+		BinaryTree tree = new BinaryTree();
 		tree.root = new Node(1);
 		tree.root.left = new Node(2);
 		tree.root.right = new Node(3);
@@ -34,16 +34,44 @@ public class BinaryTreeTest {
 		tree.root.left.right.right = new Node(11);
 		tree.root.right.left.left = new Node(12);
 
-		assertEquals("Test Lowest common ancestor of a 1 and 10",1,tree.findLCA(1,10).name);
-		assertEquals("Test Lowest common ancestor of a 9 and 5",2,tree.findLCA(9,5).name);
-		assertEquals("Test Lowest common ancestor of a 3 and 7",3,tree.findLCA(3,7).name);
-		assertEquals("Test Lowest common ancestor of a 8 and 4",4,tree.findLCA(8,4).name);
+		assertEquals(1,tree.LCA(1,10));
+		assertEquals(2,tree.LCA(9,5));
+		assertEquals(3,tree.LCA(3,7));
+		assertEquals(4,tree.LCA(8,4));
 
 	}
 	
+	@Test 
+	public void testEven() {
+		BinaryTree tree = new BinaryTree();
+		tree.root = new Node(1);
+		tree.root.left = new Node(2);
+		tree.root.right = new Node(3);
+		tree.root.left.left = new Node(4);
+		
+		assertEquals(1,tree.LCA(1,2));
+		assertEquals(1,tree.LCA(3,4));
+
+
+	}
+	
+	
+	
+	@Test 
+	public void testSameName() {
+		BinaryTree tree = new BinaryTree();
+		tree.root = new Node(1);
+		tree.root.left = new Node(2);
+		tree.root.right = new Node(3);
+		tree.root.left.left = new Node(4);
+		
+		assertEquals(4,tree.LCA(4,4));
+
+
+	}
 	@Test
-	public void testmissingLcaNode() {
-		BinaryTree tree= new BinaryTree();
+	public void testMissing() {
+		BinaryTree tree = new BinaryTree();
 		tree.root = new Node(1);
 		tree.root.left = new Node(2);
 		tree.root.right = new Node(3);
@@ -56,42 +84,75 @@ public class BinaryTreeTest {
 		tree.root.left.right.left = new Node(10);
 		tree.root.left.right.right = new Node(11);
 		tree.root.right.left.left = new Node(12);
-		assertEquals("Test Lowest Common Ancestor of 1 and 8383838",1,tree.findLCA(1,8383838).name);
+		assertEquals(-1,tree.LCA(1,8383838));
 		
 	}
 	@Test 
-	public void testEventree() {
-		BinaryTree tree= new BinaryTree();
-		tree.root = new Node(1);
-		tree.root.left = new Node(2);
-		tree.root.right = new Node(3);
-		tree.root.left.left = new Node(4);
-		
-		assertEquals("Test Lowest Common Ancestor of 1 and 2",1,tree.findLCA(1,2).name);
-		assertEquals("Test Lowest Common Ancestor of 3 and 4",1,tree.findLCA(3,4).name);
-
-
-	}
-	@Test 
-	public void testUnEventree() {
-		BinaryTree tree= new BinaryTree();
+	public void testOdd() {
+		BinaryTree tree = new BinaryTree();
 		tree.root = new Node(1);
 		tree.root.left = new Node(2);
 		tree.root.right = new Node(3);
 		
-		assertEquals("Test Lowest Common Ancestor of 1 and 2",1,tree.findLCA(1,2).name);
-		assertEquals("Test Lowest Common Ancestor of 3 and 1",1,tree.findLCA(3,1).name);
+		assertEquals(1,tree.LCA(1,2));
+		assertEquals(1,tree.LCA(3,1));
 
 
 	}
 	@Test 
-	public void testLookingForSameNode() {
-		BinaryTree tree= new BinaryTree();
-		tree.root = new Node(1);
-		tree.root.left = new Node(2);
-		tree.root.right = new Node(3);
-		tree.root.left.left = new Node(4);
+	public void testDAG() {
 		
-		assertEquals("Test Lowest Common Ancestor of 4 and 4",4,tree.findLCA(4,4).name);
+		BinaryTree theGraph=new BinaryTree();
+		Node root= new Node(1);
+		Node nodeTwo= new Node(2);
+		Node nodeThree = new Node(3);
+		Node nodeFour = new Node(4);
+		Node nodeFive= new Node(5);
+		Node nodeSix = new Node(6);
+		Node nodeSeven = new Node(7);
+		
+		
+		theGraph.addToGraph(root);
+		theGraph.addToGraph(nodeTwo);
+		theGraph.addToGraph(nodeThree);
+		theGraph.addToGraph(nodeFour);
+		theGraph.addToGraph(nodeFive);
+		theGraph.addToGraph(nodeSix);
+		theGraph.addToGraph(nodeSeven);
+
+		
+		theGraph.addRelations(root, nodeTwo);
+		theGraph.addRelations(root, nodeThree);
+		theGraph.addRelations(nodeTwo, nodeFour);
+		theGraph.addRelations(nodeThree, nodeFour);
+		theGraph.addRelations(nodeFour, nodeFive);
+		theGraph.addRelations(nodeFour, nodeSix);
+		theGraph.addRelations(nodeSix, nodeSeven);
+		theGraph.addRelations(root, nodeSeven);
+
+
+		assertEquals(1, theGraph.LCA_DAG(root, nodeTwo, nodeThree ));
+		assertEquals(1, theGraph.LCA_DAG(root, root, root ));
+		assertEquals(4, theGraph.LCA_DAG(root, nodeFive, nodeSix ));
+		assertEquals(3, theGraph.LCA_DAG(root, nodeFour, nodeThree ));
+		assertEquals(1, theGraph.LCA_DAG(root, root, nodeSeven ));
+
+
+
+
+
 	}
+	@Test
+	public void testEmptyDAG() {
+		BinaryTree theGraph = new BinaryTree();
+		assertEquals(-1,theGraph.LCA(0,0));
+	}
+	public void oneNodeDAG() {
+		BinaryTree theGraph = new BinaryTree();
+		Node root= new Node(1);
+		theGraph.addToGraph(root);
+		assertEquals(1, theGraph.LCA_DAG(root, root, root ));
+		
+	}
+	
 }
