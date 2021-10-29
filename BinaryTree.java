@@ -1,48 +1,91 @@
-class Node{
+import java.util.ArrayList;
+import java.util.List;
+
+class Node {
+	ArrayList<Node> relations;
 	int name;
-	Node left;
-	Node right;
-	public Node(int name) {
-		this.name=name;
-		left=right=null;
+	Node left, right;
+	
+	Node(int name) {
+		this.name = name;
+		left = right = null;
+		relations = null;
 	}
 }
-public class BinaryTree{
-	//Root of the Binary Tree
-    Node root;
- 
-    Node findLCA(int n1, int n2)
-    {
-        return findLCA(root, n1, n2);
-    }
- 
-    // This function returns pointer to LCA of two given
-    // values n1 and n2. This function assumes that n1 and
-    // n2 are present in Binary Tree
-    Node findLCA(Node node, int n1, int n2)
-    {
-        // Base case
-        if (node == null)
-            return null;
- 
-        // If either n1 or n2 matches with root's key, report
-        // the presence by returning root (Note that if a key is
-        // ancestor of other, then the ancestor key becomes LCA
-        if (node.name == n1 || node.name == n2)
-            return node;
- 
-        // Look for keys in left and right subtrees
-        Node left_lca = findLCA(node.left, n1, n2);
-        Node right_lca = findLCA(node.right, n1, n2);
- 
-        // If both of the above calls return Non-NULL, then one key
-        // is present in once subtree and other is present in other,
-        // So this node is the LCA
-        if (left_lca!=null && right_lca!=null)
-            return node;
- 
-        // Otherwise check if left subtree or right subtree is LCA
-        return (left_lca != null) ? left_lca : right_lca;
-    }
- 
+
+public class BinaryTree {
+
+	Node root;
+	List<Integer> firstNameList = new ArrayList<>();
+	List<Integer> secondNameList = new ArrayList<>();
+
+	int LCA(int node1, int node2) {
+		firstNameList.clear();
+		secondNameList.clear();
+		return findLCA(root, node1, node2);
+	}
+
+	private int findLCA(Node root, int node1, int node2) {
+		if(!findPath(root, node1, firstNameList)|| !findPath(root, node2,secondNameList)) {
+			return -1;
+		}
+		int i;
+		for(i=0; i < firstNameList.size() && i < secondNameList.size(); i++) {
+			if(!firstNameList.get(i).equals(secondNameList.get(i))) {
+				break;
+			}
+		}
+		return firstNameList.get(i-1);
+		
+	}
+	
+	protected int LCA_DAG(Node root, Node nodeOne, Node nodeTwo) {
+		if(nodeOne !=null && nodeTwo != null) {
+			if(nodeOne.relations !=null && nodeTwo.relations != null) {
+				for(int i = 0; i <nodeTwo.relations.size();i++) {
+					for (int j = 0;j<nodeOne.relations.size();j++) {
+						if(nodeTwo.relations.get(i) == nodeOne.relations.get(j)) {
+							return nodeTwo.relations.get(i).name;
+						}
+					}
+				}
+			}else {
+				return -1;
+			}
+		}
+		return -1;
+	}
+	private boolean findPath(Node root, int num, List<Integer> path) {
+		if (root == null) {
+			return false;	
+		} else {
+			path.add(root.name);
+			if (root.name == num) {
+				return true;
+			}
+			if (root.left != null && findPath(root.left, num, path)) {
+				return true;
+			}
+			if (root.right != null && findPath(root.right, num, path)) {
+				return true;
+			}
+			path.remove(path.size() - 1);
+			return false;
+		}
+	}
+	public void addToGraph(Node nodeOne) {
+		nodeOne.relations = new ArrayList<Node>();
+		nodeOne.relations.add(nodeOne);
+		
+	}
+	public void addRelations(Node nodeOne, Node nodeTwo) {
+		int i;
+		for(i=0; i<nodeOne.relations.size();i++) {
+			if(!nodeTwo.relations.contains(nodeOne.relations.get(i))) {
+				nodeTwo.relations.add(nodeOne.relations.get(i));
+			}
+			
+		}
+	}
+
 }
